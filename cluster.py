@@ -5,13 +5,20 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
 
+from features import FEATURE_COLUMNS
+
+
+# count-like columns with a long right tail
+LOG_COLUMNS = ["total_checkouts", "items_per_visit"]
+
 
 def preprocess(features: pd.DataFrame) -> np.ndarray:
-    """Log-transform skewed count columns, then standardize.
-
-    TODO: log1p on total_checkouts etc.; StandardScaler; return ndarray.
-    """
-    raise NotImplementedError
+    """Keep FEATURE_COLUMNS, log-transform skewed counts, then standardize."""
+    X = features[[c for c in FEATURE_COLUMNS if c in features]].copy()
+    for col in LOG_COLUMNS:
+        if col in X:
+            X[col] = np.log1p(X[col])
+    return StandardScaler().fit_transform(X.to_numpy(dtype=float))
 
 
 def run_kmeans(X: np.ndarray, k: int, seed: int = 0) -> np.ndarray:
@@ -36,6 +43,6 @@ ALGORITHMS = {
 def profile_clusters(features: pd.DataFrame, labels: np.ndarray) -> pd.DataFrame:
     """Mean of each feature per cluster + cluster size. This is the table
     you read to name the clusters ("looks like a kids/DVD cluster")."""
-    return features.assign(cluster=labels).groupby("cluster").agg(["mean"]).join(
-        pd.Series(labels).value_counts().rename("size")
-    )
+    prof = features.assign(cluster=labels).groupby("cluster").mean()
+    prof.insert(0, "size", pd.Series(labels).value_counts().sort_index().to_numpy())
+    return prof

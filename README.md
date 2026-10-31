@@ -1,63 +1,60 @@
-# Patron Clustering: ML for Libraries (proof of concept)
+# Patron clustering
 
-Simulate library patron checkout behavior, export it to CSV, then cluster patrons
-to see whether recognizable "patron types" emerge.
+A small experiment for my ML for Libraries topic exploration (ISLT 7301). The question: if all you have is circulation data, can clustering find recognizable kinds of patrons?
 
-## Design principle: no archetypes in the generator
+I cannot use real patron records for a class project, so the project simulates them. The simulation is built so that it cannot cheat.
 
-The generator never contains a "researcher" or "kid" type. Each patron gets
-**continuous latent traits** (age, household role, activity level, interest mix).
-Checkout behavior follows from those traits. Types can only emerge where traits
-are correlated, as they are in real life.
+## How it works
 
-The **coupling** knob (config.py) controls how strongly age/household drive
-interests. Low coupling means near-random data. High coupling means strong
-structure. The sweep experiment varies it.
+1. **Simulate patrons.** Each patron gets an age, an activity level, a household card flag, and a mix of interests. The generator has no patron "types" in it. A kids-and-DVDs patron can only appear because age tilts the interest mix toward kids' books and shows. The `coupling` setting controls how strong that tilt is. At 0, interests have nothing to do with age.
+2. **Simulate a year of checkouts** from those traits. The result looks like what an ILS would export: patron id, date, format, subject. Nothing else.
+3. **Build one row per patron** from the checkouts (share of DVDs, share of kids' subjects, total checkouts, and so on) and cluster the rows with k-means, a Gaussian mixture, or hierarchical clustering.
 
-## Pipeline
+Only after clustering does the code look back at the hidden traits, to ask whether the clusters mean anything. The traits never go into the clustering.
+
+## Run it
 
 ```
-run_simulation.py  ->  data/events.csv            (one row per checkout)
-                       data/latent_traits.csv     (hidden truth, NOT fed to clustering)
-features.py        ->  data/patron_features.csv   (one row per patron; clustering input)
-run_clustering.py  ->  data/clusters_<algo>.csv + cluster profile tables
-run_sweep.py       ->  results/sweep.csv          (coupling vs. clustering quality)
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python demo.py
 ```
 
-## Layout
+`demo.py` does all three steps, prints the cluster profiles, and saves a figure to `results/`. The figure shows the patrons in two dimensions, what each cluster looks like in the features, and how each cluster lines up with the hidden interests.
+
+Things to try:
+
+- `python demo.py --coupling 0` and `python demo.py --coupling 2`
+- `python demo.py --algo gmm --k 4`
+- `python demo.py --show` to open the figure in a window
+
+The steps also run on their own: `run_simulation.py` writes the CSVs to `data/`, `run_clustering.py` clusters them, `run_sweep.py` repeats the whole thing across coupling values and seeds, and `plot_sweep.py` plots that.
+
+## What comes out
+
+With the default settings, k-means with five clusters gives roughly: heavy users who read a bit of everything, light users, a kids-and-DVDs group, an academic nonfiction group, and adult fiction readers with the large print share. The silhouette score is low (around 0.2). The clusters overlap, as real patrons would. Picking k is not clean either. That is part of the point.
+
+## Limits
+
+- It is simulated data. The generator has no types, but I chose the correlations, so this shows the method, not a fact about any library.
+- The comparison with the hidden traits is a sanity check, not ground truth. There is no ground truth.
+- Patrons with fewer than three checkouts are dropped. Shares computed from one or two checkouts do not say much.
+- Nothing is calibrated against real data yet. Seattle Public Library's open checkout data would be the place to start.
+
+## Files
 
 ```
-config.py            all knobs in one dataclass
-catalog.py           formats x subjects (what can be checked out)
-traits.py            sample latent patron traits
+config.py            all settings in one place
+catalog.py           formats, subjects, and how interests map to them
+traits.py            hidden patron traits
 behavior.py          traits -> checkout events
-features.py          events -> per-patron feature table
-cluster.py           kmeans / GMM / hierarchical wrappers
-evaluate.py          internal metrics, stability, post-hoc trait comparison
-run_simulation.py    CLI
-run_clustering.py    CLI
-run_sweep.py         CLI
+features.py          events -> one row per patron
+cluster.py           preprocessing and the three algorithms
+evaluate.py          metrics, bootstrap stability, post-hoc comparison
+demo.py              everything in one run, with a figure
+run_simulation.py    step 1 and 2
+run_clustering.py    step 3
+run_sweep.py         coupling x algorithm x seed -> results/sweep.csv
+plot_sweep.py        plot the sweep
 ```
-
-## Realism checklist (the "make it messy" part)
-
-- [ ] Heavy-tailed activity (most patrons check out little, a few check out constantly)
-- [ ] Overlapping interests (researcher who also reads fiction)
-- [ ] Mixed-use household cards (parent card: kid DVDs + adult fiction)
-- [ ] Seasonality (summer reading, holidays)
-- [ ] Sparse patrons (1-2 checkouts all year)
-- [ ] Calibrate marginals to open data (Seattle Public Library checkouts)
-
-## Evaluation without planted labels
-
-No ground-truth clusters exist, so:
-1. **Internal quality**: silhouette, Davies-Bouldin, BIC for GMM
-2. **Stability**: ARI between clusterings on bootstrap resamples
-3. **Post-hoc interpretation**: do clusters line up with latent traits
-   (dominant interest x age band)? This is a soft reference, not a planted truth.
-
-## Open decisions
-
-- Number of patrons / time window (default 2000 patrons, 1 year)
-- Which features to engineer (see features.py)
-- Whether to calibrate against Seattle data in v1 or v2
