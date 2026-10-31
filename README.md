@@ -1,6 +1,6 @@
 # Patron clustering
 
-A small experiment for my ML for Libraries topic exploration (ISLT 7301). The question: if all you have is circulation data, can clustering find recognizable kinds of patrons?
+A small experiment for my ML for Libraries topic exploration (ISLT 7301). The question: can you use clustering to find patterns in circulation data?
 
 I cannot use real patron records for a class project, so the project simulates them. The simulation is built so that it cannot cheat.
 
