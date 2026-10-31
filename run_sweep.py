@@ -37,7 +37,7 @@ def main():
             events = simulate_all(patrons, cfg, rng)
             features = build_features(events)
             X = preprocess(features)
-            ref = reference_partition(patrons.loc[features.index])
+            ref = reference_partition(patrons.set_index("patron_id").loc[features.index])
             for name, algo in ALGORITHMS.items():
                 labels = algo(X, K)
                 rows.append({
