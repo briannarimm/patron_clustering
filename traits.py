@@ -1,12 +1,10 @@
-"""Sample latent patron traits. No archetype labels anywhere."""
 import numpy as np
 import pandas as pd
 
 from config import SimConfig
 from catalog import INTERESTS
 
-# Age mixture: (weight, mean, sd). Roughly child / teen / adult / senior, but the
-# component index is thrown away. Only the age survives.
+# Age mixture: (weight, mean, sd)
 AGE_MIXTURE = [
     (0.20, 9, 3),
     (0.10, 15, 1.5),
@@ -16,7 +14,6 @@ AGE_MIXTURE = [
 
 
 def sample_age(n: int, rng: np.random.Generator) -> np.ndarray:
-    """Age distribution of cardholders (continuous mixture, not labeled types)."""
     weights, means, sds = (np.array(c) for c in zip(*AGE_MIXTURE))
     comp = rng.choice(len(AGE_MIXTURE), size=n, p=weights)
     age = rng.normal(means[comp], sds[comp])
@@ -24,23 +21,15 @@ def sample_age(n: int, rng: np.random.Generator) -> np.ndarray:
 
 
 def sample_activity(n: int, cfg: SimConfig, rng: np.random.Generator) -> np.ndarray:
-    """Expected visits per year, heavy-tailed (lognormal)."""
     return rng.lognormal(cfg.activity_mu, cfg.activity_sigma, size=n)
 
 
 def _ramp(x: float, lo: float, hi: float) -> float:
-    """0 at lo, 1 at hi, linear in between."""
     return float(np.clip((x - lo) / (hi - lo), 0, 1))
 
 
 def interest_alpha(age: float, household: bool, cfg: SimConfig) -> np.ndarray:
-    """Dirichlet parameters over INTERESTS for one patron.
-
-    The mean direction is flat + coupling * tilt(age, household), rescaled so
-    the total concentration stays at cfg.interest_concentration. Coupling then
-    only moves *where* a patron's interests point, not how specialized they are.
-    At coupling 0 every patron draws from the same flat Dirichlet.
-    """
+    """Dirichlet parameters over INTERESTS for one patron"""
     # smooth age curves, each in [0, 1]
     kid = 1 - _ramp(age, 6, 13)
     teen = float(np.exp(-((age - 15) / 3) ** 2))
@@ -59,7 +48,6 @@ def interest_alpha(age: float, household: bool, cfg: SimConfig) -> np.ndarray:
         "hobby_practical":    0.4 * adult + 0.4 * senior,
     }
     if household:
-        # a parent's card gets kid use on top of their own
         tilt["kids_books"] += 0.8
         tilt["kids_media"] += 0.8
 
@@ -69,8 +57,6 @@ def interest_alpha(age: float, household: bool, cfg: SimConfig) -> np.ndarray:
 
 
 def sample_patrons(cfg: SimConfig, rng: np.random.Generator) -> pd.DataFrame:
-    """One row per patron: patron_id, age, household_card, activity, and the
-    latent interest mix (one column per interest, summing to 1)."""
     n = cfg.n_patrons
     age = sample_age(n, rng)
     household = (rng.random(n) < cfg.household_card_rate) & (age >= 22)
