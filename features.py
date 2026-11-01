@@ -3,12 +3,10 @@ import pandas as pd
 
 from catalog import KIDS_SUBJECTS, FICTION_SUBJECTS, ACADEMIC_SUBJECTS
 
-# Patrons with fewer checkouts than this are dropped. One or two checkouts give
-# percentages of 0 or 1 and say nothing about the patron.
+# Minimum checkouts. If below then patron dropped
 MIN_CHECKOUTS = 3
 
-# Clustering input. The volume-only columns below are computed too, but they
-# all track total_checkouts and would let activity level swamp everything else.
+# Clustering input
 FEATURE_COLUMNS = [
     "total_checkouts",        # log-transformed downstream
     "pct_dvd",
@@ -41,8 +39,6 @@ def _regularity(dates: pd.Series) -> float:
 
 
 def build_features(events: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate events to patron-level features, indexed by patron_id.
-    Returns FEATURE_COLUMNS + EXTRA_COLUMNS; preprocess() picks the former."""
     ev = events.copy()
     ev["date"] = pd.to_datetime(ev["date"])
     g = ev.groupby("patron_id")
