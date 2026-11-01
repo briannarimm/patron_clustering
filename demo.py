@@ -1,13 +1,3 @@
-"""Run the whole pipeline once and look at the result.
-
-Simulates patrons, builds features, clusters them, prints the cluster profiles,
-and saves a figure with three panels: the patrons in 2D, what each cluster
-looks like in the features, and how the clusters line up with the hidden traits.
-
-Usage:  python demo.py [--coupling 1.0] [--k 5] [--algo kmeans] [--show]
-
-Try --coupling 0 and --coupling 2 to see the point of the sweep.
-"""
 import argparse
 import os
 
