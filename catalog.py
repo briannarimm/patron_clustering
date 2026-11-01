@@ -41,8 +41,8 @@ INTEREST_TO_SUBJECTS: dict[str, list[str]] = {
                            "740s crafts", "790s sports"],
 }
 
-# Subject groups that features.py counts. These are things a cataloger could
-# derive from the call number, not from the latent interest.
+# Subject groups that features.py counts. 
+# These are things a cataloger could derive from the call number.
 KIDS_SUBJECTS = {s for s in sum(INTEREST_TO_SUBJECTS.values(), []) if s.startswith("j ")}
 FICTION_SUBJECTS = set(INTEREST_TO_SUBJECTS["adult_fiction"]) | {"j fiction", "ya fiction", "ya fantasy"}
 ACADEMIC_SUBJECTS = set(INTEREST_TO_SUBJECTS["academic_reference"])
