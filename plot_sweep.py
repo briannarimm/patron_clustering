@@ -1,7 +1,3 @@
-"""Plot results/sweep.csv: clustering quality against coupling, one line per algorithm.
-
-Usage:  python plot_sweep.py [--show]
-"""
 import argparse
 
 import matplotlib
