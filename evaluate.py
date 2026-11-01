@@ -33,11 +33,6 @@ def bootstrap_stability(X: np.ndarray, algo, k: int, n_boot: int = 20,
 
 
 def reference_partition(latent: pd.DataFrame) -> np.ndarray:
-    """Soft post-hoc reference: dominant latent interest x age band.
-
-    NOT a planted truth. It is a coarse human-readable summary of the latent
-    traits, used only to ask "do the clusters line up with something meaningful?"
-    """
     dominant = latent[INTERESTS].idxmax(axis=1).astype(str)
     band = pd.cut(latent["age"], AGE_BANDS, labels=AGE_LABELS).astype(str)
     return pd.factorize(band + "/" + dominant)[0]
