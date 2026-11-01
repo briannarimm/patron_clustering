@@ -1,7 +1,3 @@
-"""Generate events.csv, latent_traits.csv, and patron_features.csv.
-
-Usage:  python run_simulation.py [--n-patrons 2000] [--coupling 1.0] [--seed 42]
-"""
 import argparse
 import os
 
