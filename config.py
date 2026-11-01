@@ -1,4 +1,4 @@
-"""All simulation and analysis knobs in one place."""
+# knobs for data simulation
 from dataclasses import dataclass, field
 
 

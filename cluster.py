@@ -42,7 +42,7 @@ ALGORITHMS = {
 
 def profile_clusters(features: pd.DataFrame, labels: np.ndarray) -> pd.DataFrame:
     """Mean of each feature per cluster + cluster size. This is the table
-    you read to name the clusters ("looks like a kids/DVD cluster")."""
+    you read to name the clusters ("Oh! That looks like a kids/DVD cluster!"). Like reading tea leaves :P"""
     prof = features.assign(cluster=labels).groupby("cluster").mean()
     prof.insert(0, "size", pd.Series(labels).value_counts().sort_index().to_numpy())
     return prof

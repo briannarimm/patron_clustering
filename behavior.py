@@ -27,12 +27,7 @@ def seasonal_weights(n_days: int, cfg: SimConfig) -> np.ndarray:
 
 def simulate_patron(patron: pd.Series, day_weights: np.ndarray,
                     cfg: SimConfig, rng: np.random.Generator) -> list[dict]:
-    """One patron's checkout events for the year.
-
-    Visits ~ Poisson(activity), visit days ~ day_weights, 1+ items per visit.
-    Each item follows the latent interest mix, except a noise_rate share that
-    picks an interest uniformly.
-    """
+    """One patron's checkout events for the year."""
     n_visits = rng.poisson(patron["activity"])
     if n_visits == 0:
         return []
