@@ -54,21 +54,3 @@ Desktop.ini
 *.bak
 *.orig
 *.tmp
-
-# --- AI assistant files (local only) ---
-CLAUDE.md
-CLAUDE.local.md
-claude.md
-.claude/
-AGENTS.md
-GEMINI.md
-.cursor/
-.cursorrules
-.cursorignore
-.windsurf/
-.windsurfrules
-.aider*
-.continue/
-.codeium/
-.copilot/
-.github/copilot-instructions.md
