@@ -2,7 +2,7 @@
 
 A small experiment for my ML for Libraries topic exploration (ISLT 7301). The question: can you use clustering to find patterns in circulation data?
 
-I cannot use real patron records for a class project, so the project simulates them. The simulation is built so that it cannot cheat.
+I simulate patron records. In the future, I want to incorporate data from public libraries, especially [the data available from Seattle Public Libraries](https://data.seattle.gov/Community-and-Culture/Checkouts-by-Title/tmmm-ytt6/about_data).
 
 ## How it works
 
@@ -37,10 +37,7 @@ With the default settings, k-means with five clusters gives roughly: heavy users
 
 ## Limits
 
-- It is simulated data. The generator has no types, but I chose the correlations, so this shows the method, not a fact about any library.
-- The comparison with the hidden traits is a sanity check, not ground truth. There is no ground truth.
-- Patrons with fewer than three checkouts are dropped. Shares computed from one or two checkouts do not say much.
-- Nothing is calibrated against real data yet. Seattle Public Library's open checkout data would be the place to start.
+The clustering uses simulated data. As mentioned above, I want to rework this program to analyze Seattle Public Library's public circulation data.
 
 ## Files
 
