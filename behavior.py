@@ -11,7 +11,7 @@ _FORMAT_P = {i: np.array(list(f.values())) for i, f in INTEREST_TO_FORMAT.items(
 
 
 def seasonal_weights(n_days: int, cfg: SimConfig) -> np.ndarray:
-    """Per-day relative probability of a visit (summer bump, holiday dip, Sunday dip)."""
+    """Per-day relative probability of a visit (such as summer bump, holiday dip, Sunday dip)."""
     days = pd.date_range(cfg.start_date, periods=n_days)
     doy = days.dayofyear.to_numpy()
     s = cfg.seasonality
@@ -62,7 +62,7 @@ def simulate_patron(patron: pd.Series, day_weights: np.ndarray,
 
 def simulate_all(patrons: pd.DataFrame, cfg: SimConfig,
                  rng: np.random.Generator) -> pd.DataFrame:
-    """Events for everyone, as a real ILS would export them (no latent column)."""
+    """Everyone's actions exported!"""
     day_weights = seasonal_weights(cfg.n_days, cfg)
     events = []
     for _, patron in patrons.iterrows():
