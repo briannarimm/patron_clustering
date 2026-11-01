@@ -1,12 +1,3 @@
-"""The headline experiment: how does clustering quality change with coupling?
-
-For each coupling value and each algorithm:
-  simulate -> build features -> cluster -> record silhouette, stability,
-  and agreement with the soft latent reference.
-Writes results/sweep.csv; plot it for the presentation.
-
-Usage:  python run_sweep.py
-"""
 import os
 
 import numpy as np
