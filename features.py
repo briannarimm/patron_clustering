@@ -1,8 +1,3 @@
-"""Events -> one row per patron (clustering input).
-
-The clustering only ever sees what a real library could compute from
-circulation records. No latent traits leak in here.
-"""
 import numpy as np
 import pandas as pd
 
