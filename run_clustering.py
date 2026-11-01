@@ -1,7 +1,3 @@
-"""Cluster patron_features.csv and print cluster profiles.
-
-Usage:  python run_clustering.py [--k 5] [--algo kmeans]
-"""
 import argparse
 
 import pandas as pd
